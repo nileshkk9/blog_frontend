@@ -11,7 +11,7 @@ class Login extends Component {
     email: "",
     password: "",
     name: "",
-    place: "",
+    role: "",
     isSuccess: "",
     isloading: false,
   };
@@ -22,9 +22,14 @@ class Login extends Component {
     }
   }
   componentDidUpdate() {
-    if (this.state.isSuccess) {
+    if (this.state.token) {
       auth.login(() => {
-        localStorage.setItem("LoginData", JSON.stringify(this.state));
+        const { email, token, role } = this.state;
+
+        localStorage.setItem(
+          "LoginData",
+          JSON.stringify({ email, token, role })
+        );
         this.props.history.push("/main");
       });
     }
@@ -49,12 +54,12 @@ class Login extends Component {
     axios
       .post(url, login)
       .then((res) => {
-        // console.log(res.data);
         this.setState({
           isSuccess: true,
           isloading: false,
           name: res.data.name,
-          place: res.data.place,
+          token: res.data.token,
+          role: res.data.user.role,
         });
         if (!this.state.isSuccess) {
           wrongLogin.display = "block";

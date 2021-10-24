@@ -1,0 +1,24 @@
+.blog-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px;
+}
+.header span {
+  font-size: 2em;
+}
+.logout-btn {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 15px;
+  font-size: 1em;
+  cursor: pointer;
+}
+.logout-btn:hover {
+  background-color: rgb(243, 86, 86);
+}
