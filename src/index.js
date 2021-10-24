@@ -8,16 +8,17 @@ import reportWebVitals from './reportWebVitals';
 import Login from "./components/Login/Login";
 import NotFound from "./components/NotFound/NotFound";
 // import ChangePassword from "./components/ChangePassword/ChangePassword";
-import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
+
 import CreateAccount from "./components/CreateAccount/CreateAccount";
 import PrivateRouter from './utils/PrivateRouter';
 import Main from './components/Main/Main';
+import Dashboard from './components/Dashboard/Dashboard';
 const routing = (
   <BrowserRouter>
     <div>
       <Switch>
-        <Route path="/" component={Login} exact />
-        <Route path="/forgot-password" component={ForgotPassword} exact />
+        <Route path="/" component={Dashboard} exact />
+        <Route path="/login" component={Login} exact />
         <PrivateRouter path="/main" component={Main} />
         {/* <Route path="/:token/:email" component={ChangePassword} exact /> */}
         <Route path="/create-account" component={CreateAccount} exact />

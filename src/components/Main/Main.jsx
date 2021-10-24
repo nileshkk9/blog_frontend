@@ -3,6 +3,7 @@ import axios from "axios";
 import "./Main.css";
 import Blog from "../BlogView/Blog";
 import { apiEndpoint } from "../../utils/urls";
+import Header from "../Header/Header";
 class Main extends Component {
   state = {
     blogs: [],
@@ -15,11 +16,22 @@ class Main extends Component {
       });
     }
   }
-  logout = () => {
-    localStorage.removeItem("LoginData");
-    window.location.href = "/";
-  };
+  handleClick = (blogid) => {
+    // when approved change the status of published to true
 
+    const url = `${apiEndpoint}/blogs/approve`;
+    axios
+      .post(url, { blogid }, { headers: { Authorization: this.state.token } })
+      .then((res) => {
+        this.setState({
+          blogs: this.state.blogs.filter((blog) => blog._id !== blogid),
+        });
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   fetchBlogs = () => {
     const url = `${apiEndpoint}/blogs/showall`;
     console.log(this.state);
@@ -36,17 +48,15 @@ class Main extends Component {
   render() {
     return (
       <div>
-        <div className="header">
-          <span >{this.state.role}</span>
-          <button onClick={this.logout} className="logout-btn">
-            Logout
-          </button>
-        </div>
-
+        <Header />
         {this.state.blogs.length > 0 ? (
           <div className="blog-grid">
             {this.state.blogs.map((blog) => (
-              <Blog data={blog} key={blog._id} />
+              <Blog
+                data={blog}
+                key={blog._id}
+                approveClick={this.handleClick}
+              />
             ))}
           </div>
         ) : (
