@@ -1,6 +1,6 @@
 import React from "react";
 import "./Header.css";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import auth from "../../utils/auth";
 const logout = () => {
   auth.logout(() => {
@@ -8,7 +8,11 @@ const logout = () => {
     window.location.href = "/";
   });
 };
-const Header = () => {
+const Header = (props) => {
+  const path = useLocation().pathname;
+  const isAdmin = auth.isAuthenticatedAsAdmin();
+  const isWriter = auth.isAuthenticated();
+
   return (
     <nav className="navbar navbar-expand-sm bg-primary navbar-dark">
       <ul className="navbar-nav">
@@ -17,28 +21,40 @@ const Header = () => {
             Writer.com
           </Link>
         </li>
-        <li className="nav-item">
-          <Link className="nav-link" to="/main">
-            Manage
-          </Link>
-        </li>
-        <li className="nav-item">
-          <Link className="nav-link" to="/">
-            Link
-          </Link>
-        </li>
+        {isAdmin ? (
+          <li className="nav-item">
+            <Link
+              className={`nav-link ${path === "/main" ? "active" : ""}`}
+              to="/main"
+            >
+              Manage
+            </Link>
+          </li>
+        ) : null}
+        {isWriter ? (
+          <li className="nav-item">
+            <Link
+              className={`nav-link ${path === "/write-blog" ? "active" : ""}`}
+              to="/write-blog"
+            >
+              NewBlog
+            </Link>
+          </li>
+        ) : null}
       </ul>
 
       <div className="navbar-collapse collapse w-100 order-3 dual-collapse2">
         <ul className="navbar-nav ml-auto">
           <li className="nav-item">
-            <Link className="nav-link active" to="/create-account">
-              Create Account
-            </Link>
+            {isWriter || isAdmin ? null : (
+              <Link className="nav-link active" to="/create-account">
+                Create Account
+              </Link>
+            )}
           </li>
           <li className="nav-item">
-            {auth.isAuthenticated() ? (
-              <Link className="nav-link active" onClick={logout}>
+            {isWriter || isAdmin ? (
+              <Link className="nav-link active" onClick={logout} to="/">
                 Logout
               </Link>
             ) : (

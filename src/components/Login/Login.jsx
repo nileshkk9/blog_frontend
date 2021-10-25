@@ -19,19 +19,23 @@ class Login extends Component {
     if (localStorage.getItem("LoginData")) {
       const state = JSON.parse(localStorage.getItem("LoginData"));
       this.setState({ ...state });
+      this.props.history.push("/");
     }
   }
-  componentDidUpdate() {
-    if (this.state.token) {
-      auth.login(() => {
-        const { email, token, role } = this.state;
+  setLocalStorage = () => {
+    const { email, token, role } = this.state;
 
-        localStorage.setItem(
-          "LoginData",
-          JSON.stringify({ email, token, role })
-        );
-        this.props.history.push("/main");
+    localStorage.setItem("LoginData", JSON.stringify({ email, token, role }));
+    this.props.history.push("/");
+  };
+  componentDidUpdate() {
+    if (this.state.role === "CONTENT-WRITER") {
+      auth.login(() => {
+        this.setLocalStorage();
       });
+    } else if (this.state.role === "ADMIN") {
+      auth.loginAdmin();
+      this.setLocalStorage();
     }
   }
   handleChange = (e) => {
@@ -50,7 +54,6 @@ class Login extends Component {
       email: this.state.email,
       password: this.state.password,
     };
-    // console.log(login.email, login.password);
     axios
       .post(url, login)
       .then((res) => {

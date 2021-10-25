@@ -11,18 +11,19 @@ import NotFound from "./components/NotFound/NotFound";
 
 import CreateAccount from "./components/CreateAccount/CreateAccount";
 import PrivateRouter from './utils/PrivateRouter';
+import AdminRouter from './utils/AdminRouter';
 import Main from './components/Main/Main';
 import Dashboard from './components/Dashboard/Dashboard';
+import Writeblog from './components/Writeblog/Writeblog';
 const routing = (
   <BrowserRouter>
     <div>
       <Switch>
         <Route path="/" component={Dashboard} exact />
         <Route path="/login" component={Login} exact />
-        <PrivateRouter path="/main" component={Main} />
-        {/* <Route path="/:token/:email" component={ChangePassword} exact /> */}
+        <PrivateRouter path="/write-blog" component={Writeblog} exact />
+        <AdminRouter path="/main" component={Main} />
         <Route path="/create-account" component={CreateAccount} exact />
-        {/* <PrivateRouter path="/entries" component={Listview} /> */}
         <Route component={NotFound} />
       </Switch>
     </div>

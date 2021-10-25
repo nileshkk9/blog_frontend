@@ -19,10 +19,15 @@ const Blog = (props) => {
         </React.Fragment>
       ) : (
         <React.Fragment>
-          <button className="btn btn-danger mb-1">Delete</button>
+          <button
+            className="btn btn-danger mb-1"
+            onClick={() => props.deleteBlog(props.data._id, "delete")}
+          >
+            Delete
+          </button>
           <button
             className="btn btn-primary"
-            onClick={() => props.approveClick(props.data._id)}
+            onClick={() => props.approveClick(props.data._id, "approve")}
           >
             Approve
           </button>

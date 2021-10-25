@@ -11,10 +11,19 @@ class Dashboard extends Component {
 
   componentDidMount() {
     if (localStorage.getItem("LoginData")) {
-      auth.login(() => {
-        this.fetchBlogs();
+      // auth.login(() => {});
+      const state = JSON.parse(localStorage.getItem("LoginData"));
+
+      this.setState({ ...state }, () => {
+        console.log("STATE:", this.state);
+        if (this.state.role === "CONTENT-WRITER") {
+          auth.login(() => {});
+        } else if (this.state.role === "ADMIN") {
+          auth.loginAdmin();
+        }
       });
     }
+    this.fetchBlogs();
   }
   fetchBlogs = () => {
     const url = `${apiEndpoint}/blogs/showactiveposts`;

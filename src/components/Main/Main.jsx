@@ -16,10 +16,10 @@ class Main extends Component {
       });
     }
   }
-  handleClick = (blogid) => {
+  handleClick = (blogid, cmd) => {
     // when approved change the status of published to true
 
-    const url = `${apiEndpoint}/blogs/approve`;
+    const url = `${apiEndpoint}/blogs/${cmd}`;
     axios
       .post(url, { blogid }, { headers: { Authorization: this.state.token } })
       .then((res) => {
@@ -32,6 +32,7 @@ class Main extends Component {
         console.log(err);
       });
   };
+
   fetchBlogs = () => {
     const url = `${apiEndpoint}/blogs/showall`;
     console.log(this.state);
@@ -56,6 +57,7 @@ class Main extends Component {
                 data={blog}
                 key={blog._id}
                 approveClick={this.handleClick}
+                deleteBlog={this.handleClick}
               />
             ))}
           </div>
