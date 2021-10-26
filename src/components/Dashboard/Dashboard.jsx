@@ -4,47 +4,46 @@ import Blog from "../BlogView/Blog";
 import axios from "axios";
 import auth from "../../utils/auth";
 import { apiEndpoint } from "../../utils/urls";
+import { connect } from "react-redux";
+import { setBlogs } from "../../redux/blog/blog.action";
+import { setCurrentUser } from "../../redux/user/user.action";
 class Dashboard extends Component {
-  state = {
-    blogs: [],
-  };
-
   componentDidMount() {
     if (localStorage.getItem("LoginData")) {
-      // auth.login(() => {});
       const state = JSON.parse(localStorage.getItem("LoginData"));
-
-      this.setState({ ...state }, () => {
-        console.log("STATE:", this.state);
-        if (this.state.role === "CONTENT-WRITER") {
-          auth.login(() => {});
-        } else if (this.state.role === "ADMIN") {
-          auth.loginAdmin();
-        }
-      });
+      this.verifyToken(state);
     }
     this.fetchBlogs();
   }
-  fetchBlogs = () => {
-    const url = `${apiEndpoint}/blogs/showactiveposts`;
-    console.log(this.state);
+  verifyToken = (state) => {
+    const url = `${apiEndpoint}/users/auth`;
     axios
-      .get(url)
+      .post(url, {}, { headers: { Authorization: state.token } })
       .then((res) => {
-        console.log(res.data);
-        this.setState({ blogs: res.data });
+        console.log("AUTHORIZED");
+        this.props.setCurrentUser({ ...state });
       })
       .catch((err) => {
         console.log(err);
       });
   };
+  fetchBlogs = () => {
+    const url = `${apiEndpoint}/blogs/showactiveposts`;
+    axios
+      .get(url)
+      .then((res) => {
+        this.props.setBlogs(res.data);
+      })
+      .catch((err) => {});
+  };
   render() {
+    const blogs = this.props.blogs;
     return (
       <div>
         <Header />
-        {this.state.blogs.length > 0 ? (
+        {blogs.length > 0 ? (
           <div className="blog-grid">
-            {this.state.blogs.map((blog) => (
+            {blogs.map((blog) => (
               <Blog data={blog} key={blog._id} dashboard={true} />
             ))}
           </div>
@@ -55,5 +54,13 @@ class Dashboard extends Component {
     );
   }
 }
+const mapDispatchToProps = (dispatch) => ({
+  setBlogs: (blog) => dispatch(setBlogs(blog)),
+  setCurrentUser: (user) => dispatch(setCurrentUser(user)),
+});
 
-export default Dashboard;
+const mapStateToProps = (state) => ({
+  blogs: state.blog.blogs,
+  currentUser: state.user.currentUser,
+});
+export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);

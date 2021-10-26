@@ -1,13 +1,14 @@
 import React from "react";
 import { Route, Redirect } from "react-router-dom";
-import auth from "./auth";
+import { connect } from "react-redux";
 
 const AdminRouter = ({ component: Component, ...rest }) => {
+  const { currentUser } = rest;
   return (
     <Route
       {...rest}
       render={(props) => {
-        if (auth.isAuthenticatedAsAdmin()) {
+        if (currentUser.role === "ADMIN") {
           return <Component {...props} />;
         } else {
           return (
@@ -25,4 +26,8 @@ const AdminRouter = ({ component: Component, ...rest }) => {
     />
   );
 };
-export default AdminRouter;
+
+const mapStateToProps = (state) => ({
+  currentUser: state.user.currentUser,
+});
+export default connect(mapStateToProps)(AdminRouter);

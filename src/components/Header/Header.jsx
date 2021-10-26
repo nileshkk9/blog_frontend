@@ -2,6 +2,7 @@ import React from "react";
 import "./Header.css";
 import { Link, useLocation } from "react-router-dom";
 import auth from "../../utils/auth";
+import { connect } from "react-redux";
 const logout = () => {
   auth.logout(() => {
     localStorage.removeItem("LoginData");
@@ -10,8 +11,8 @@ const logout = () => {
 };
 const Header = (props) => {
   const path = useLocation().pathname;
-  const isAdmin = auth.isAuthenticatedAsAdmin();
-  const isWriter = auth.isAuthenticated();
+  const isAdmin = props.currentUser.role === "ADMIN";
+  const isWriter = props.currentUser.role === "CONTENT-WRITER";
 
   return (
     <nav className="navbar navbar-expand-sm bg-primary navbar-dark">
@@ -54,6 +55,14 @@ const Header = (props) => {
           </li>
           <li className="nav-item">
             {isWriter || isAdmin ? (
+              <strong className="nav-link active text-warning">
+                {props.currentUser.role}
+              </strong>
+            ) : null}
+          </li>
+
+          <li className="nav-item">
+            {isWriter || isAdmin ? (
               <Link className="nav-link active" onClick={logout} to="/">
                 Logout
               </Link>
@@ -68,4 +77,8 @@ const Header = (props) => {
     </nav>
   );
 };
-export default Header;
+
+const mapStateToProps = (state) => ({
+  currentUser: state.user.currentUser,
+});
+export default connect(mapStateToProps)(Header);

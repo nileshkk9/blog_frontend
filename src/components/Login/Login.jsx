@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 import auth from "../../utils/auth";
 import { apiEndpoint } from "../../utils/urls";
 import Spinner from "../Spinner/Spinner";
+import { connect } from "react-redux";
+import { setCurrentUser } from "../../redux/user/user.action";
 
 class Login extends Component {
   state = {
@@ -18,26 +20,29 @@ class Login extends Component {
   componentDidMount() {
     if (localStorage.getItem("LoginData")) {
       const state = JSON.parse(localStorage.getItem("LoginData"));
-      this.setState({ ...state });
-      this.props.history.push("/");
+      this.verifyToken(state);
     }
   }
+  verifyToken = (state) => {
+    const url = `${apiEndpoint}/users/auth`;
+    axios
+      .post(url, {}, { headers: { Authorization: state.token } })
+      .then((res) => {
+        console.log("AUTHORIZED");
+        this.props.setCurrentUser({ ...state });
+        this.props.history.push("/");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   setLocalStorage = () => {
-    const { email, token, role } = this.state;
+    const { email, token, role } = this.props.currentUser;
 
     localStorage.setItem("LoginData", JSON.stringify({ email, token, role }));
     this.props.history.push("/");
   };
-  componentDidUpdate() {
-    if (this.state.role === "CONTENT-WRITER") {
-      auth.login(() => {
-        this.setLocalStorage();
-      });
-    } else if (this.state.role === "ADMIN") {
-      auth.loginAdmin();
-      this.setLocalStorage();
-    }
-  }
+
   handleChange = (e) => {
     this.setState({
       [e.target.id]: e.target.value,
@@ -57,18 +62,21 @@ class Login extends Component {
     axios
       .post(url, login)
       .then((res) => {
+        this.props.setCurrentUser({
+          token: res.data.token,
+          role: res.data.user.role,
+        });
         this.setState({
           isSuccess: true,
           isloading: false,
-          name: res.data.name,
-          token: res.data.token,
-          role: res.data.user.role,
         });
         if (!this.state.isSuccess) {
           wrongLogin.display = "block";
         } else {
           wrongLogin.display = "none";
         }
+
+        this.setLocalStorage();
       })
       .catch((error) => {
         this.setState({ isloading: false, isSuccess: false });
@@ -163,4 +171,10 @@ const wrongLogin = {
   margin: "0px auto",
   transition: "0.5s all",
 };
-export default Login;
+const mapDispatchToProps = (dispatch) => ({
+  setCurrentUser: (user) => dispatch(setCurrentUser(user)),
+});
+const mapStateToProps = (state) => ({
+  currentUser: state.user.currentUser,
+});
+export default connect(mapStateToProps, mapDispatchToProps)(Login);
